@@ -1,0 +1,36 @@
+--Create a Clothing Store Database
+
+Create Table Store (ID Integer Primary Key, Item text, Color text, Price Integer, Number_Sold Integer);
+
+INSERT into Store values (1, "T-Shirt", "White", 15, 20);
+INSERT into Store values (2, "Blouse", "Pink", 24, 13);
+INSERT into Store values (3, "Long Sleeve T", "Green", 25, 5);
+INSERT into Store values (4, "Jeans", "Blue", 38, 12);
+INSERT into Store values (5, "Jeans", "Black", 40, 15);
+INSERT into Store values (6, "Joggers", "Green", 30, 10);
+INSERT into Store values (7, "Joggers", "Black", 30, 11);
+INSERT into Store values (8, "Sneakers", "White", 35, 8);
+INSERT into Store values (9, "Sneakers", "Black", 35, 6);
+INSERT into Store values (10, "Sneakers", "Nude", 35, 9);
+INSERT into Store values (11, "Sneakers", "Red", 35, 4);
+INSERT into Store values (12, "Hat", "White", 10, 15);
+INSERT into Store values (13, "Hat", "Black", 10, 12);
+INSERT into Store values (14, "Hat", "Red", 10, 5);
+INSERT into Store values (15, "Hat", "Pink", 10, 9);
+
+
+--Display the database ordered by price. 
+Select * from Store
+Order by Price desc
+
+--What is the avg price of items that are white?
+Select AVG(Price) as Average_Price
+from Store
+where Color = 'White'
+
+--What are the 5 most popular items? 
+Select Item, Price, Number_Sold
+from Store
+Order by Number_Sold desc
+Limit 5
+
