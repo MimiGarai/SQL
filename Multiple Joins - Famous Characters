@@ -6,8 +6,13 @@ Create table characters (id integer primary key autoincrement, First_Name text, 
 Insert into characters (First_Name, Last_Name) values ("Harry", "Potter");
 Insert into characters (First_Name, Last_Name) values ("Ron", "Weasley");
 Insert into characters (First_Name, Last_Name) values ("Ginny", "Weasley");
-Insert into characters (First_Name, Last_name) values ("Hermione", "Granger");
-
+Insert into characters (First_Name, Last_Name) values ("Hermione", "Granger");
+Insert into characters (First_Name, Last_Name) values ("Severus", "Snape");
+Insert into characters (First_Name, Last_Name) values ("Rubius", "Hagrid");
+Insert into characters (First_Name, Last_Name) values ("Molly", "Weasley");
+Insert into characters (First_Name, Last_Name) values ("Arthur", "Weasley");
+Insert into characters (First_Name, Last_Name) values ("Nymphadora", "Tonks");
+Insert into characters (First_Name, Last_Name) values ("Remus", "Lupin");
 /* How are they related to other characters? */
 Create table relationship (id integer primary key autoincrement, character_id integer,  status text, spousal_id integer);
 
@@ -15,11 +20,20 @@ Insert into relationship (character_id, status, spousal_id) values (1, "Married"
 Insert into relationship (character_id, status, spousal_id) values (2, "Married", 4);
 Insert into relationship (character_id, status, spousal_id) values (3, "Married", 1);
 Insert into relationship (character_id, status, spousal_id) values (4, "Married", 2);
+Insert into relationship (character_id, status) values (5, "Hopeless Romantic");
+Insert into relationship (character_id, status) values (6, "Single");
+Insert into relationship (character_id, status, spousal_id) values (7, "Married", 8);
+Insert into relationship (character_id, status, spousal_id) values (8, "Married", 7);
+Insert into relationship (character_id, status, spousal_id) values (9, "Married", 10);
+Insert into relationship (character_id, status, spousal_id) values (10, "Married", 9);
 
-/* Create a table that shows only the pairs of spouses. */
+
+/* Create a table that shows only the pairs of spouses */
 
 select a.First_Name as Character_Name, b.First_Name as Spouse_Name from relationship
 join characters a
 on relationship.character_id = a.id
 join characters b
 on relationship.spousal_id = b.id;
+
+
