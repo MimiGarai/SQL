@@ -1,0 +1,67 @@
+# In this SQL code I am querying a database that contains messy data.
+
+/* 1) How many orders were placed in January? */
+
+Select count(*) From BIT_DB.JanSales
+where length(orderID) = 6
+and orderID <> 'Order ID'
+and orderID <> ''
+and orderID IS Not Null
+;
+
+/* 2) How many of those orders were from an iPhone? */
+
+Select count(*) From BIT_DB.JanSales
+where length(orderID) = 6
+and orderID <> 'Order ID'
+and orderID <> ''
+and orderID IS Not Null
+and Product = 'iPhone'
+;
+
+/* 3) Select the customer account numbers for all the orders that were placed in February. */
+
+Select distinct acctnum from BIT_DB.FebSales
+join BIT_DB.customers
+on BIT_DB.FebSales.orderID = BIT_DB.customers.order_id
+where length(orderID) = 6
+and orderID <> ''
+and orderID IS Not Null
+and orderID <> 'Order ID'
+;
+
+/* 4) Which product was the cheapest sold in January and what was the product? */
+
+Select distinct Product, Price from BIT_DB.JanSales
+Order by Price asc
+limit 1;
+
+/* 5) What is the total revenue for each product sold in January? */
+
+Select product, sum(Quantity), price, sum(Quantity)*price as Revenue 
+from BIT_DB.JanSales
+Group by product
+;
+
+/* 6) Which products were sold in February at 548 Lincoln St, Seattle, WA 98101, 
+how many of each were sold, and what was the total revenue? */
+
+Select Product, Quantity, sum(Quantity)*price as Revenue
+from BIT_DB.FebSales
+where location = '548 Lincoln St, Seattle, WA 98101'
+Group by Product
+;
+
+/* 7) How many customers ordered more than 2 products at a time in February, 
+and what was the average amount spent for those customers? */
+
+select 
+count(distinct Cust.acctnum)
+, avg(quantity*price)
+from BIT_DB.FebSales Feb
+Left join BIT_DB.customers Cust
+on Feb.orderID=Cust.order_id
+where Feb.Quantity>2
+and length(orderID) = 6
+and orderID <> 'Order ID'
+;
