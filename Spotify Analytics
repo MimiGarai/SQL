@@ -25,16 +25,15 @@ time_signature integer NOT NULL
 )
 
 #Then I inserted the Spotify Data .csv into the table.
-#Next, I explored the data using the following SQL. 
+#Next, I explored the data using the following SQL and answering the below questions. 
 
-
-#First I determined the avg popularity, danceability, and energy by artist and track. 
+/* What is the avg popularity, danceability, and energy by artist and track? */
 
 Select artist_name, track_name, avg(popularity),avg(danceability),avg(energy)
 from BIT_DB.Spotifydata
 Group by artist_name, track_name;
 
-#Next, I determined who the top 10 artists by average popularity?
+/* Who are the top 10 artists by average popularity? */
 
 select artist_name, avg(popularity)
 from BIT_DB.Spotifydata
@@ -43,14 +42,14 @@ order by popularity desc
 limit 10
 ;
 
-#Then I found which artist released the longest song.
+/* Which artist released the longest song? */
 
 Select artist_name, track_name, duration_ms
 from BIT_DB.Spotifydata
 order by duration_ms desc
 limit 1;
 
-#Last I found what the average danceability for the 10 most popular songs is.
+/* What the average danceability for the 10 most popular songs? */
 
 Select avg(danceability)
 from 
@@ -60,4 +59,16 @@ from
     limit 10)
 ;
 
+/* Calculate the average popularity for the artists in the Spotify data table. 
+Then, for every artist with an average popularity of 90 or above, show their name, 
+their average popularity, and label them as a “Top Star”. */
 
+With popularity_average_CTE as (
+    Select s.artist_name, avg(s.popularity) as average_popularity
+    from Spotifydata s
+    group by s.artist_name
+    )
+select artist_name, average_popularity, 'Top Star' as tag
+from popularity_average_CTE
+where average_popularity>=90
+;
