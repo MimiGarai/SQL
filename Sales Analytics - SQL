@@ -1,1 +1,178 @@
+# For this project, I downloaded a dataset called chinook from BreakIntoTech.Teachable.com, which represents a digital media store 
+  # and includes tables for artists, albums, media tracks, invoices, and customers.
+# I performed the below analytics on the data using complex SQL including multiple joins, subqueries, and filtering messy data. 
 
+/* 1. Show Customers (their full names, customer ID, and country) who are not in the US. */
+
+Select LastName, FirstName, CustomerId, Country
+From chinook.customers
+Where Country <> 'USA'
+;
+
+/* 2. Show only the Customers from Brazil. */
+
+Select *
+From chinook.customers
+Where Country = 'Brazil'
+;
+
+/* 3. Find the Invoices of customers who are from Brazil. 
+The resulting table should show the customer's full name, Invoice ID, Date of the invoice, and billing country. */
+
+Select LastName, FirstName, InvoiceId, InvoiceDate, BillingCountry
+From customers
+Left Join invoices
+on customers.CustomerId = invoices.CustomerId
+where Country = 'Brazil'
+;
+
+/* 4. Show the Employees who are Sales Agents. */
+
+Select EmployeeId, LastName, FirstName
+From employees
+Where Title like '%Sales%Agent%'
+;
+
+/* 5. Find a unique/distinct list of billing countries from the Invoice table. */
+
+Select distinct BillingCountry
+From invoices
+;
+
+/* 6. Provide a query that shows the invoices associated with each sales agent. The resulting table should include the Sales Agent's full name. */
+
+With Support_Rep as
+    (select employees.FirstName, employees.LastName, customers.SupportRepId, customers.customerId
+    From employees
+    left join customers
+    on employees.EmployeeId = customers.SupportRepId
+    )
+select Support_Rep.FirstName, Support_Rep.LastName, invoices.invoiceID
+from Support_Rep
+Left join invoices
+on Support_Rep.CustomerId = invoices.CustomerId
+;
+
+/* 7. Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers. */
+
+With Customer_Employee as
+    (With Sales_Agent as
+        (Select EmployeeId, e.FirstName as EmployeeFirstName, e.LastName as EmployeeLastName
+        from employees e
+        where title like '%Sales%Agent%'
+        )
+
+    Select c.CustomerId, c.FirstName as CustomerFirstName, c.LastName as CustomerLastName, c.Country, EmployeeFirstName, EmployeeLastName
+    from customers c
+    left join Sales_Agent
+    on c.SupportRepId = Sales_Agent.EmployeeId
+    )
+
+select InvoiceID, Total, CustomerFirstName, CustomerLastName, Country, EmployeeFirstName, EmployeeLastName
+From invoices
+left join Customer_Employee
+on invoices.CustomerId = Customer_Employee.CustomerId
+;
+
+/* 8. How many Invoices were there in 2009? */
+
+Select count(InvoiceID)
+From invoices
+where InvoiceDate like '%2009%'
+;
+
+/* 9. What are the total sales for 2009? */
+
+Select sum(Total)
+From invoices
+Where InvoiceDate like '%2009%'
+;
+
+/* 10. Write a query that includes the purchased track name with each invoice line ID. */
+
+Select tracks.Name, invoice_items.InvoiceLineId
+From invoice_items
+left join tracks
+on invoice_items.TrackId = tracks.TrackId
+;
+
+/* 11. Write a query that includes the purchased track name AND artist name with each invoice line ID. */
+
+With b as
+    (With a as
+        (select artists.Name, albums.AlbumId
+        From albums
+        left join artists
+        on albums.ArtistId = artists.ArtistId
+        )
+    select a.Name as Artist_Name, tracks.Name as Track_Name, TrackId
+    From tracks
+    Left join a
+    on tracks.AlbumID = a.AlbumId
+    )
+Select invoice_items.InvoiceLineId, Track_Name, Artist_Name
+From invoice_items
+Left Join b
+on Invoice_items.TrackId = b.TrackID
+Order by invoice_items.InvoiceLineId
+;
+
+/* 12. Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre. */
+
+Select tracks.name as Track_Name, albums.Title as Album_Name, media_types.Name as Media_Type, genres.Name as Genre
+From tracks
+left join albums
+on tracks.AlbumId = albums.AlbumId
+left join media_types
+on tracks.MediaTypeId = media_types.MediaTypeId
+left join genres
+on tracks.GenreId = genres.GenreId
+;
+
+/* 13. Show the total sales made by each sales agent. */
+
+with a as 
+    (select employees.FirstName, employees.LastName, customers.SupportRepId, customers.CustomerId
+    From employees
+    left join customers
+    on employees.EmployeeId = customers.SupportRepId
+    where SupportRepId is not null
+    )
+select distinct a.FirstName, a.LastName, sum(invoices.Total) over (partition by a.FirstName) as "Total Sales"
+from a
+left join invoices
+on a.CustomerID = invoices.CustomerId
+;
+
+-- Or 
+
+Select emp.FirstName, emp.LastName, Round(sum(inv.Total), 2)
+From employees emp
+
+join customers cust
+on emp.EmployeeId = cust.SupportRepId
+
+join invoices inv
+on cust.CustomerId = inv.CustomerID
+
+where emp.Title like '%Sales%Agent%'
+Group by emp.FirstName
+;
+
+/* 14. Which sales agent made the most dollars in sales in 2009? */
+
+Select emp.FirstName, emp.LastName, Round(sum(inv.Total), 2) as Total_Sales
+From employees emp
+
+join customers cust
+on emp.EmployeeId = cust.SupportRepId
+
+join invoices inv
+on cust.CustomerId = inv.CustomerID
+
+where emp.Title like '%Sales%Agent%'
+and inv.InvoiceDate like '%2009%'
+Group by emp.FirstName
+Order by Total_Sales desc
+Limit 1
+;
