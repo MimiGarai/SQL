@@ -176,3 +176,20 @@ Group by emp.FirstName
 Order by Total_Sales desc
 Limit 1
 ;
+
+/* 15. How many playlists are there? */
+
+Select count(PlaylistId)
+From playlists
+;
+
+/* 16. On average, how many songs per playlist? */
+
+With a as
+    (select PlaylistId, count(TrackID) as Number_of_Tracks
+    from playlist_track
+    group by PlaylistId
+    )
+Select avg(Number_of_Tracks)
+from a
+;
