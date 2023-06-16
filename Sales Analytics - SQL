@@ -177,13 +177,28 @@ Order by Total_Sales desc
 Limit 1
 ;
 
-/* 15. How many playlists are there? */
+/* 15. Which employee had the highest vloume of invoices/made the most number of sales? */
+
+select emp.FirstName, emp.LastName, count(inv.InvoiceId) as Invoice_Count
+from employees emp
+left join customers
+on emp.EmployeeId = customers.SupportRepId
+left join invoices inv
+on customers.CustomerId = inv.CustomerId
+
+Where emp.Title like '%Sales%Agent%'
+Group by emp.LastName
+Order by Invoice_Count Desc
+Limit 1
+;
+
+/* 16. How many playlists are there? */
 
 Select count(PlaylistId)
 From playlists
 ;
 
-/* 16. On average, how many songs per playlist? */
+/* 17. On average, how many songs per playlist? */
 
 With a as
     (select PlaylistId, count(TrackID) as Number_of_Tracks
